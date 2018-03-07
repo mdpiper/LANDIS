@@ -1,0 +1,43 @@
+#!/bin/sh
+# An example of running a LANDIS-II job through torque on beach. This
+# script assumes LANDIS-II is installed in your home directory on
+# beach.
+#
+# Submit to the default queue with:
+#   $ qsub run_landis
+#
+# Mark Piper (mark.piper@colorado.edu)
+#
+#PBS -m bae
+#PBS -M jelena.vukomanovic@colorado.edu
+#PBS -l nodes=1:ppn=2
+
+# Source the LANDIS-II setup file. It contains variable definitions
+# and the 'landis' alias.
+. $PBS_O_HOME/LANDIS-II/setup
+
+# Assign the simulation name and directory. Use TMPDIR for work; it's
+# automatically created at the start of a job and deleted when the job
+# is completed.
+SIM_NAME=LANDIS_WFBDA_B5
+export TMP_TMPDIR=/state/partition1
+SIM_DIR=$TMP_TMPDIR/$SIM_NAME
+
+# Set the output archive file name. All output will be stored in this
+# archive file.
+AR_FILE=$SIM_NAME-$PBS_JOBID.tar.gz
+
+# Copy simulation input files to the simulation directory.
+cp -R $PBS_O_HOME/Scenarios/$SIM_NAME $TMP_TMPDIR
+
+# Change to the simulation directory and run LANDIS-II.
+cd $SIM_DIR
+landis scenario_B5_011515.txt
+
+# Gather output from the simulation directory and transfer it to the
+# scratch directory for pickup.
+cd $TMP_TMPDIR
+tar -zcf $AR_FILE $SIM_NAME
+mv $AR_FILE /scratch/$USER
+rm -rf $SIM_DIR
+echo "$AR_FILE written to /scratch/$USER."

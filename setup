@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Set up an environment for LANDIS-II on beach.
+# Mark Piper (mark.piper@colorado.edu)
+
+# Location of LANDIS-II install.
+export LANDIS_DIR=$HOME/LANDIS-II
+
+# Location of custom GDAL with Mono bindings for LANDIS-II.
+GDAL_VERSION=1.8.1
+# export GDAL_DIR=/usr/local/gdal-$GDAL_VERSION-gcc
+export GDAL_DIR=$LANDIS_DIR/GDAL/$GDAL_VERSION
+
+# Location of Mono install.
+export MONO_DIR=/usr/local/mono
+
+# Include Mono and custom GDAL in standard paths.
+PATH=$MONO_DIR/bin:$GDAL_DIR/bin:$PATH
+if [ $MANPATH ]; then 
+    MANPATH=$MONO_DIR/man:$MANPATH
+else
+    MANPATH=$MONO_DIR/man
+fi
+if [ $LIBRARY_PATH ]; then 
+    LIBRARY_PATH=$MONO_DIR/lib:$GDAL_DIR/lib:$LIBRARY_PATH
+else
+    LIBRARY_PATH=$MONO_DIR/lib:$GDAL_DIR/lib
+fi
+if [ $CPATH ]; then 
+    CPATH=$MONO_DIR/include:$GDAL_DIR/include:$CPATH
+else
+    CPATH=$MONO_DIR/include:$GDAL_DIR/include
+fi
+if [ $LD_LIBRARY_PATH ]; then 
+    LD_LIBRARY_PATH=$MONO_DIR/lib:$GDAL_DIR/lib:$LD_LIBRARY_PATH
+else
+    LD_LIBRARY_PATH=$MONO_DIR/lib:$GDAL_DIR/lib
+fi
+export PATH MANPATH LIBRARY_PATH CPATH LD_LIBRARY_PATH
+
+# Make a convenient alias to call LANDIS-II.
+alias landis='mono $LANDIS_DIR/v6/bin/Landis.Console-6.0.exe'
